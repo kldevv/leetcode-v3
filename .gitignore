@@ -1,0 +1,11 @@
+# MacOS
+.DS_Store
+
+# Input & Output
+**/output.txt
+**/input.txt
+
+# Python
+**/.pytest_cache
+**/__pycache__
+
