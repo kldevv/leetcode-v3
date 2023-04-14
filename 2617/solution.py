@@ -82,13 +82,13 @@ class Solution:
         next_j = [SortedList(range(n)) for _ in range(m)]
         next_i = [SortedList(range(m)) for _ in range(n)]
 
-        q = [(0, 0, 1)]
-        for i, j, move in q:
+        q = deque([(0, 0, 1)])
+        while q:
+            i, j, move = q.popleft()
             if i == m-1 and j == n-1:
                 return move
             
             dx = grid[i][j]
-
             for kj in list(next_j[i].irange(j+1, min(j+1+dx, n)-1)):
                 q.append((i, kj, move+1))
                 next_j[i].remove(kj)
