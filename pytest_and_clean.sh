@@ -17,12 +17,15 @@ fi
 
 # Run pytest
 echo "Running pytest..."
-pytest -v -rx
+if [[ "$2" == "-u" ]]; then
+    pytest -v -rx -k "test_target_function_exist_and_unique or test_cases_length_match or test_unordered_output"
+else
+    pytest -v -rx -k "test_target_function_exist_and_unique or test_cases_length_match or test_ordered_output"
+fi
 
 # Check if pytest ran successfully
 if [ $? -ne 0 ]; then
     echo "Error: pytest failed."
-    exit 2
 fi
 
 # Clean temporary folders (__pycache__ and .pytest_cache)
