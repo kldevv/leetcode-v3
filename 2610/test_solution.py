@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any, Iterable
 import pytest
 
 import solution
@@ -32,8 +32,36 @@ def test_cases_length_match():
     assert len(expected_cases) == len(input_cases)
 
 @pytest.mark.parametrize("input_case, expected_case", zip(input_cases, expected_cases))
-def test_nonnested_output(input_case, expected_case):
+def test_ordered_output(input_case, expected_case):
     obj = solution.Solution()
     target_function = [x for x in dir(obj) if '__' not in x][0]
+
+    output = eval(f'obj.{target_function}({input_case})')
+    expected = eval(expected_case)
     
-    assert eval(f'obj.{target_function}({input_case})') == eval(expected_case)
+    assert output == expected
+
+@pytest.mark.parametrize("input_case, expected_case", zip(input_cases, expected_cases))
+def test_unordered_output(input_case, expected_case):
+    def recursive_sorted(arr: List[Any]) -> List[Any]:
+        """
+        Sorts a list of lists recursively.
+        
+        Args:
+            arr: A list of any types and/or sub-lists.
+        
+        Returns:
+            A sorted list of any types and/or sub-lists.
+        """
+        for i in range(len(arr)):
+            if isinstance(arr[i], Iterable):
+                arr[i] = recursive_sorted(arr[i])
+        return sorted(arr)
+    
+    obj = solution.Solution()
+    target_function = [x for x in dir(obj) if '__' not in x][0]
+
+    output = recursive_sorted(eval(f'obj.{target_function}({input_case})'))
+    expected = recursive_sorted(eval(expected_case))
+    
+    assert output == expected
