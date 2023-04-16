@@ -1,5 +1,6 @@
 import bisect
 import heapq
+import sys
 import math
 from sortedcontainers import SortedList
 from collections import Counter, deque, defaultdict
@@ -9,12 +10,18 @@ from typing import List, Dict, Union, Any, Optional, Callable, Iterable, Set, Tu
 
 
 INF = float('inf')
+PI = 3.14159265359
 
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
         self.left = left
         self.right = right
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
 
 @cache
 def generate_primes(n: Union[int, float]) -> List[int]:
@@ -80,27 +87,28 @@ def is_square_matrix(matrix: List[List[Any]]) -> bool:
     return True
 
 class Solution:
-    def replaceValueInTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
-        p = {root: None}
-        q = deque([root])
-        vals = defaultdict(int)
-        last_floor_sum = 0
-        while q:
-            floor_sum = 0
-            for _ in range(len(q)):
-                node = q.popleft()
-                
-                if node.right:
-                    q.append(node.right)
-                    p[node.right] = node
-                    vals[node] += node.right.val
-                    floor_sum += node.right.val
-                if node.left:
-                    q.append(node.left)
-                    p[node.left] = node
-                    vals[node] += node.left.val
-                    floor_sum += node.left.val
-                
-                node.val = last_floor_sum - vals[p[node]]
-            last_floor_sum = floor_sum
-        return root
+    def splitListToParts(self, head: Optional[ListNode], k: int) -> List[Optional[ListNode]]:
+        cnt = 0
+        it = head
+        while it:
+            cnt += 1
+            it = it.next
+        
+        length = cnt // k
+        offset = cnt % k
+
+        parts = []
+
+        it = head
+        prev = None
+        while it:
+            parts.append(it)
+            for _ in range(length):
+                prev = it
+                it = it.next
+            if offset > 0:
+                offset -= 1
+                prev = it
+                it = it.next
+            prev.next = None
+        return parts + [None for _ in range(k - cnt)] 
