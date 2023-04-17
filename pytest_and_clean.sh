@@ -25,8 +25,10 @@ else
     pytest -v -rx -m ordered
 fi
 
+PYTEST_STATUS=$?
+
 # Check if pytest ran successfully
-if [ $? -ne 0 ]; then
+if [ $PYTEST_STATUS -ne 0 ]; then
     echo "Error: pytest failed."
 fi
 
@@ -43,5 +45,10 @@ else
     exit 3
 fi
 
-echo "Script completed successfully."
+# If pytest failed, exit with the pytest return status
+if [ $PYTEST_STATUS -ne 0 ]; then
+    exit 2
+fi
+
+echo "$0 $TARGET_DIR: completed successfully."
 exit 0
