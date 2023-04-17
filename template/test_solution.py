@@ -152,7 +152,7 @@ def tree_serialization(deserialize_input_params: Optional[Set[str]] = {'root'}, 
                 for k in deserialize_input_params:
                     if k in kwargs:
                         kwargs[k] = deserialize_leetcode_tree(kwargs[k])
-                
+
                 result = func(*args, **kwargs)
 
                 def serialize_tree(result):
@@ -224,18 +224,15 @@ def recursive_sorted(arr: List[Any]) -> List[Any]:
     Returns:
         A sorted list of any types and/or sub-lists.
     """
-    if isinstance(arr[i], Iterable):
+    if isinstance(arr, Iterable) and all(isinstance(x, type(arr[0])) for x in arr):
+        print(type(arr))
         for i in range(len(arr)):
                 arr[i] = recursive_sorted(arr[i])
         return sorted(arr)
     return arr
 
-def execu(input_case):
-    obj = solution.Solution()
-    func = [x for x in dir(obj) if '__' not in x][0]
-
-    output = eval(f'serialization(obj.{func})({input_case})')
-    return output
+def pop_by_two(cases):
+    return [cases[i:i+2] for i in range(0, len(cases), 2)]
 
 
 '''
@@ -258,24 +255,55 @@ expected_cases = read_cases(EXPECTED_CASES_PATH)
 '''
 TEST
 '''
+@pytest.mark.ordered
+@pytest.mark.unordered
 def test_target_function_exist_and_unique():
     obj = solution.Solution()
     public_functions = [x for x in dir(obj) if '__' not in x]
     assert len(public_functions) == 1
 
-def test_cases_length_match():
+@pytest.mark.ordered
+@pytest.mark.unordered
+def test_number_of_test_case_match():
     assert len(expected_cases) == len(input_cases)
 
+@pytest.mark.ordered
 @pytest.mark.parametrize("input_case, expected_case", zip(input_cases, expected_cases))
 def test_ordered_output(input_case, expected_case):
-    output = execu(input_case)
+    obj = solution.Solution()
+    method_name = [x for x in dir(obj) if '__' not in x][0]
+
+    output = eval(f'serialization(obj.{method_name})({input_case})')
     expected = eval(expected_case)
     
     assert output == expected
 
+@pytest.mark.unordered
 @pytest.mark.parametrize("input_case, expected_case", zip(input_cases, expected_cases))
 def test_unordered_output(input_case, expected_case):
-    output = recursive_sorted(execu(input_case))
+    obj = solution.Solution()
+    method_name = [x for x in dir(obj) if '__' not in x][0]
+    output = recursive_sorted(eval(f'serialization(obj.{method_name})({input_case})'))
     expected = recursive_sorted(eval(expected_case))
     
     assert output == expected
+
+@pytest.mark.class_design
+def test_number_of_class_design_test_case_match():
+    assert len(expected_cases) == len(input_cases) // 2
+
+@pytest.mark.class_design
+@pytest.mark.parametrize("input_case, expected_case", zip(pop_by_two(input_cases), expected_cases))
+def test_design_class_output(input_case, expected_case):
+    sigs, args = map(eval, input_case)
+
+    class_name = sigs[0]
+    init_args = args[0]
+
+    obj = eval(f'solution.{class_name}(*init_args)')
+
+    expected_case = eval(expected_case)
+
+    for (method_name, method_args), expected in zip(zip(sigs[1:], args[1:]), expected_case[1:]):
+        output = eval(f'obj.{method_name}(*method_args)')
+        assert output == expected

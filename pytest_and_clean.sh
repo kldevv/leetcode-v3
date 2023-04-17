@@ -18,9 +18,11 @@ fi
 # Run pytest
 echo "Running pytest..."
 if [[ "$2" == "-u" ]]; then
-    pytest -v -rx -k "test_target_function_exist_and_unique or test_cases_length_match or test_unordered_output"
+    pytest -v -rx -m unordered
+elif [[ "$2" == "-c" ]]; then
+    pytest -v -rx -m class_design
 else
-    pytest -v -rx -k "test_target_function_exist_and_unique or test_cases_length_match or test_ordered_output"
+    pytest -v -rx -m ordered
 fi
 
 # Check if pytest ran successfully
