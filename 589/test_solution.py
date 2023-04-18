@@ -6,9 +6,9 @@ import pytest
 
 import solution
 
-TreeNode_INVOLVED = True
+TreeNode_INVOLVED = False
 ListNode_INVOLVED = True
-Node_INVOLVED = False
+Node_INVOLVED = True
 
 '''
 CLASS

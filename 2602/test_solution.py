@@ -6,11 +6,12 @@ import pytest
 
 import solution
 
-TREE_SERIALIZATION = True
-SLL_SERIALIZATION = True
+TreeNode_INVOLVED = True
+ListNode_INVOLVED = True
+Node_INVOLVED = False
 
 '''
-CLASSES
+CLASS
 '''
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
@@ -18,15 +19,41 @@ class TreeNode:
         self.left = left
         self.right = right
 
+
 class ListNode:
     def __init__(self, val=0, next=None):
         self.val = val
         self.next = next
 
+
+class Node:
+    def __init__(self, val=None, children=None):
+        self.val = val
+        self.children = children
+
+
 '''
 SERIALIZATION
+DESERIALIZATION
 '''
-def deserialize_leetcode_tree(data: List[Union[int, None]]) -> Optional[TreeNode]:
+def serialize_leetcode_list_node(head: Optional[ListNode]) -> List[Union[int, None]]:
+    """
+    Serialize a linked list into a list of integers and None values in LeetCode-style.
+
+    Args:
+        head (ListNode): The head of the linked list.
+
+    Returns:
+        List[Union[int, None]]: The serialized linked list.
+    """
+    serialized = []
+    current = head
+    while current:
+        serialized.append(current.val)
+        current = current.next
+    return serialized
+
+def deserialize_leetcode_tree_node(data: List[Union[int, None]]) -> Optional[TreeNode]:
     """
     Deserializes a LeetCode-style tree input into a TreeNode structure.
     
@@ -58,7 +85,7 @@ def deserialize_leetcode_tree(data: List[Union[int, None]]) -> Optional[TreeNode
 
     return root
 
-def serialize_leetcode_tree(root: TreeNode) -> List[Union[int, None]]:
+def serialize_leetcode_tree_node(root: Optional[TreeNode]) -> List[Union[int, None]]:
     """
     Serializes a TreeNode structure into a LeetCode-style tree input.
     
@@ -90,36 +117,19 @@ def serialize_leetcode_tree(root: TreeNode) -> List[Union[int, None]]:
 
     return result
 
-def serialize_leetcode_linked_list(head: ListNode) -> List[Union[int, None]]:
-    """
-    Serialize a linked list into a list of integers and None values in LeetCode-style.
-
-    Args:
-        head (ListNode): The head of the linked list.
-
-    Returns:
-        List[Union[int, None]]: The serialized linked list.
-    """
-    serialized = []
-    current = head
-    while current:
-        serialized.append(current.val)
-        current = current.next
-    return serialized
-
-def deserialize_leetcode_linked_list(serialized: List[Union[int, None]]) -> ListNode:
+def deserialize_leetcode_list_node(data: Optional[List[Union[int, None]]]) -> ListNode:
     """
     Deserialize a list of integers and None values into a linked list in LeetCode-style.
 
     Args:
-        serialized (List[Union[int, None]]): The serialized linked list.
+        data (List[Union[int, None]]): The serialized linked list.
 
     Returns:
         ListNode: The deserialized linked list.
     """
-    if not serialized:
+    if not data:
         return None
-    nodes = deque(ListNode(val=val) if val is not None else None for val in serialized)
+    nodes = deque(ListNode(val=val) if val is not None else None for val in data)
     head = nodes.popleft()
     current = head
     while nodes:
@@ -128,7 +138,65 @@ def deserialize_leetcode_linked_list(serialized: List[Union[int, None]]) -> List
         current = node
     return head
 
-def tree_serialization(deserialize_input_params: Optional[Set[str]] = {'root'}, enabled: bool = True) -> Callable[..., List[Union[int, None]]]:
+def serialize_leetcode_node(root: Optional[Node]) -> List[Union[int, None]]:
+    """Serializes an n-ary tree to a list of Union[int, None].
+    
+    Args:
+        root (Optional[Node]): The root node of the n-ary tree.
+        
+    Returns:
+        List[Union[int, None]]: The serialized list representation of the n-ary tree.
+    """
+    if root is None:
+        return []
+
+    def preorder_traversal(node: Node, result: List[Union[int, None]]) -> None:
+        if node is None:
+            return
+
+        result.append(node.val)
+
+        for child in node.children:
+            preorder_traversal(child, result)
+
+        result.append(None)
+
+    result = []
+    preorder_traversal(root, result)
+    return result
+
+def deserialize_leetcode_node(data: List[Union[int, None]]) -> Optional[Node]:
+    """Deserializes a list of Union[int, None] to an n-ary tree.
+    
+    Args:
+        data (List[Union[int, None]]): The serialized list representation of the n-ary tree.
+        
+    Returns:
+        Optional[Node]: The root node of the deserialized n-ary tree.
+    """
+    data = deque(data)
+    root, _ = Node(data.popleft()), data.popleft()
+
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+
+        while data and data[0] != None:
+            child = Node(data.popleft())
+            if node.children == None:
+                node.children = []
+            node.children.append(child)
+            queue.append(child)
+        
+        if data:
+            data.popleft()
+
+    return root
+
+'''
+DECOR
+'''
+def tree_node_serialization(deserialize_input_params: Optional[Set[str]] = {'root'}, enabled: bool = False) -> Callable[..., List[Union[int, None]]]:
     """
     Decorator to convert a LeetCode-style serialized tree_adaptor input into a deserialized tree before calling the target function,
     and to convert the target function's output into a serialized tree.
@@ -137,9 +205,6 @@ def tree_serialization(deserialize_input_params: Optional[Set[str]] = {'root'}, 
         deserialize_input_params (Optional[Set[str]]): A set of parameter names to deserialize from the input kwargs.
             If None, no parameters will be deserialized.
             Default is {'root'}.
-        serialize_output_params (Optional[Set[int]]): A set of indices of the output tuple to serialize to LeetCode-style.
-            If None, no output will be serialized.
-            Default is None.
 
     Returns:
         A wrapped function that takes serialized tree inputs and returns serialized tree outputs.
@@ -151,22 +216,22 @@ def tree_serialization(deserialize_input_params: Optional[Set[str]] = {'root'}, 
             def wrapper(*args, **kwargs) -> List[Union[int, None]]:
                 for k in deserialize_input_params:
                     if k in kwargs:
-                        kwargs[k] = deserialize_leetcode_tree(kwargs[k])
+                        kwargs[k] = deserialize_leetcode_tree_node(kwargs[k])
 
                 result = func(*args, **kwargs)
 
-                def serialize_tree(result):
+                def serialize_tree_node(result):
                     if isinstance(result, Optional[TreeNode]):
-                        return serialize_leetcode_tree(result)
+                        return serialize_leetcode_tree_node(result)
                     elif isinstance(result, tuple):
-                        return tuple(serialize_tree(v) for v in result)
+                        return tuple(serialize_tree_node(v) for v in result)
                     elif isinstance(result, list):
-                        return [serialize_tree(v) for v in result]
+                        return [serialize_tree_node(v) for v in result]
                     elif isinstance(result, set):
-                        return set(serialize_tree(v) for v in result)
+                        return set(serialize_tree_node(v) for v in result)
                     else:
                         return result
-                return serialize_tree(result)
+                return serialize_tree_node(result)
             
             return wrapper
         else:
@@ -174,20 +239,20 @@ def tree_serialization(deserialize_input_params: Optional[Set[str]] = {'root'}, 
 
     return decorator
 
-def sll_serialization(deserialize_input_params: Union[Set[str], List[str], None] = {'head'}, enabled: bool = False) -> Callable[..., List[Union[int, None]]]:
+def list_node_serialization(deserialize_input_params: Union[Set[str], List[str], None] = {'head'}, enabled: bool = False) -> Callable[..., List[Union[int, None]]]:
     def decorator(func: Callable[..., Any]) -> Callable[..., List[Union[int, None]]]:
         if enabled:
             @wraps(func)
             def wrapper(*args, **kwargs) -> List[Union[int, None]]:
                 for k in deserialize_input_params:
                     if k in kwargs:
-                        kwargs[k] = deserialize_leetcode_linked_list(kwargs[k])
+                        kwargs[k] = deserialize_leetcode_list_node(kwargs[k])
 
                 result = func(*args, **kwargs)
 
                 def serialize_linked_lists(result):
                     if isinstance(result, Optional[ListNode]):
-                        return serialize_leetcode_linked_list(result)
+                        return serialize_leetcode_list_node(result)
                     elif isinstance(result, tuple):
                         return tuple(serialize_linked_lists(v) for v in result)
                     elif isinstance(result, list):
@@ -203,9 +268,40 @@ def sll_serialization(deserialize_input_params: Union[Set[str], List[str], None]
         
     return decorator
 
+def node_serialization(deserialize_input_params: Union[Set[str], List[str], None] = {'root'}, enabled: bool = False) -> Callable[..., List[Union[int, None]]]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., List[Union[int, None]]]:
+        if enabled:
+            @wraps(func)
+            def wrapper(*args, **kwargs) -> List[Union[int, None]]:
+                for k in deserialize_input_params:
+                    if k in kwargs:
+                        kwargs[k] = deserialize_leetcode_node(kwargs[k])
+
+                result = func(*args, **kwargs)
+
+                def serialize_tree(result):
+                    if isinstance(result, Optional[Node]):
+                        return serialize_leetcode_node(result)
+                    elif isinstance(result, tuple):
+                        return tuple(serialize_tree(v) for v in result)
+                    elif isinstance(result, list):
+                        return [serialize_tree(v) for v in result]
+                    elif isinstance(result, set):
+                        return set(serialize_tree(v) for v in result)
+                    else:
+                        return result
+                        
+                return serialize_tree(result)
+            return wrapper
+        else:
+            return func
+        
+    return decorator
+
 def serialization(func):
-    @tree_serialization(enabled=TREE_SERIALIZATION)
-    @sll_serialization(enabled=SLL_SERIALIZATION)
+    @node_serialization(enabled=Node_INVOLVED)
+    @tree_node_serialization(enabled=TreeNode_INVOLVED)
+    @list_node_serialization(enabled=ListNode_INVOLVED)
     @wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
@@ -236,7 +332,9 @@ def pop_by_two(cases):
 
 
 '''
-LOAD CASES
+================================================
+DATA
+================================================
 '''
 INPUT_CASES_PATH = r'./input.txt'
 EXPECTED_CASES_PATH = r'./expected.txt'
@@ -253,7 +351,9 @@ expected_cases = read_cases(EXPECTED_CASES_PATH)
 
 
 '''
+================================================
 TEST
+================================================
 '''
 @pytest.mark.ordered
 @pytest.mark.unordered
