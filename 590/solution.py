@@ -92,5 +92,14 @@ def is_square_matrix(matrix: List[List[Any]]) -> bool:
     return True
 
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def postorder(self, root: 'Node') -> List[int]:
+        out = []
+        def traverse(root: 'Node'):
+            if not root:
+                return
+            if root.children:
+                for c in root.children:
+                    traverse(c)
+            out.append(root.val)
+        traverse(root)
+        return out
