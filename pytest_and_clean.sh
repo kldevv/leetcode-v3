@@ -47,6 +47,7 @@ fi
 
 # If pytest failed, exit with the pytest return status
 if [ $PYTEST_STATUS -ne 0 ]; then
+    echo "Error: $1 Test failed."
     exit 2
 fi
 

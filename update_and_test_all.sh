@@ -5,7 +5,7 @@ TEMPLATE_DIR="./template"
 TEST_FILE="test_solution.py"
 CONFIG_FILE="pytest.ini"
 
-if [[ "$1" != "--skip-update" ]]; then
+if [[ "$1" != "--only-pytest" ]]; then
     # Iterate through all the directories, excluding the "template" directory and hidden folders
     find . -type d -maxdepth 1 ! -path . ! -path "$TEMPLATE_DIR" ! -path './.*' -exec bash -c '
     TEMPLATE_DIR="$1"
@@ -30,7 +30,7 @@ if [[ "$1" != "--skip-update" ]]; then
     fi
 fi
 
-if [[ "$1" != "--skip-pytest" ]]; then
+if [[ "$1" != "--only-update" ]]; then
     # Loop through all subdirectories in the current directory
     for dir in $(find . -type d -maxdepth 1 ! -path . ! -path './.*' ! -path "./template"); do
         echo "Running pytest for $dir ..."

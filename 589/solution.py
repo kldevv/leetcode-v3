@@ -26,7 +26,7 @@ class ListNode:
 class Node:
     def __init__(self, val=None, children=None):
         self.val = val
-        self.children = children
+        self.children = children if children != None else []
 
 
 @cache

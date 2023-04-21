@@ -93,5 +93,44 @@ def is_square_matrix(matrix: List[List[Any]]) -> bool:
     return True
 
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def minimumTotalPrice(self, n: int, edges: List[List[int]], price: List[int], trips: List[List[int]]) -> int:
+        adj_list = [[] for _ in range(n)]
+        for cur_node, neigh_node in edges:
+            adj_list[cur_node].append(neigh_node)
+            adj_list[neigh_node].append(cur_node)
+        
+        
+        def find_pass_by_nodes(start_node, end_node, passed_by_nodes_occur):
+            def back_track(cur_node, par_node):
+                passed_by_nodes_occur[cur_node] += 1
+
+                if cur_node == end_node:
+                    return True
+
+                for neigh_node in adj_list[cur_node]:
+                    if neigh_node != par_node:
+                        if back_track(neigh_node, cur_node):
+                            return True
+                        passed_by_nodes_occur[neigh_node] -= 1
+
+            back_track(start_node, None)
+
+
+        passed_by_nodes_occur = [0] * n
+        for start_node, end_node in trips:
+            find_pass_by_nodes(start_node, end_node, passed_by_nodes_occur)
+        
+        @cache
+        def alt_reduce(cur_node, par_node, selectable):
+            cost = price[cur_node] * passed_by_nodes_occur[cur_node]
+            reduce_cost = cost // 2 if selectable else INF
+
+            for neigh_node in adj_list[cur_node]:
+                if neigh_node != par_node:
+                    if selectable:
+                        reduce_cost += alt_reduce(neigh_node, cur_node, False)
+                    cost += alt_reduce(neigh_node, cur_node, True)
+            
+            return min(reduce_cost, cost)
+        
+        return min(alt_reduce(0, None, True), alt_reduce(0, None, False))

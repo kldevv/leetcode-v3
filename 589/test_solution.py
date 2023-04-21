@@ -7,8 +7,13 @@ import pytest
 import solution
 
 TreeNode_INVOLVED = False
+TreeNode_PARAMS = {'root'}
+
 ListNode_INVOLVED = True
+ListNode_PARAMS = {'head'}
+
 Node_INVOLVED = True
+Node_PARAMS = {'root'}
 
 '''
 CLASS
@@ -299,9 +304,9 @@ def node_serialization(deserialize_input_params: Union[Set[str], List[str], None
     return decorator
 
 def serialization(func):
-    @node_serialization(enabled=Node_INVOLVED)
-    @tree_node_serialization(enabled=TreeNode_INVOLVED)
-    @list_node_serialization(enabled=ListNode_INVOLVED)
+    @node_serialization(deserialize_input_params=Node_PARAMS, enabled=Node_INVOLVED)
+    @tree_node_serialization(deserialize_input_params=TreeNode_PARAMS, enabled=TreeNode_INVOLVED)
+    @list_node_serialization(deserialize_input_params=ListNode_PARAMS, enabled=ListNode_INVOLVED)
     @wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)

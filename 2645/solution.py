@@ -93,5 +93,16 @@ def is_square_matrix(matrix: List[List[Any]]) -> bool:
     return True
 
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def addMinimum(self, word: str) -> int:
+        ops = 0
+        cur_c_idx = 0
+
+        for c in word:
+            c_idx = ord(c) - ord('a')
+            if c_idx == cur_c_idx:
+                cur_c_idx = (cur_c_idx + 1) % 3
+            else:
+                ops += (c_idx + 3 - cur_c_idx) % 3
+                cur_c_idx = (c_idx + 1) % 3
+        ops += (3 - cur_c_idx) % 3
+        return ops

@@ -9,7 +9,6 @@ from typing import List, Dict, Union, Any, Optional, Callable, Iterable, Set, Tu
 
 
 INF = float('inf')
-PI = 3.14159
 
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
@@ -93,5 +92,15 @@ def is_square_matrix(matrix: List[List[Any]]) -> bool:
     return True
 
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def rowAndMaximumOnes(self, mat: List[List[int]]) -> List[int]:
+        m = len(mat)
+
+        max_ones = 0
+        max_ones_idx = 0
+        for i in range(m):
+            ones = sum(mat[i])
+            if ones > max_ones:
+                max_ones = ones
+                max_ones_idx = i
+
+        return [max_ones_idx, max_ones]

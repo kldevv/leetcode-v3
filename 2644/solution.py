@@ -93,5 +93,20 @@ def is_square_matrix(matrix: List[List[Any]]) -> bool:
     return True
 
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def maxDivScore(self, nums: List[int], divisors: List[int]) -> int:
+        max_score = -1
+        best_d = 0
+        for d in divisors:
+            score = 0
+            for num in nums:
+                if d <= num and num % d == 0:
+                    score += 1
+            print(score, d)
+            if score >= max_score:
+                if score == max_score:
+                    best_d = min(best_d, d)
+                else:
+                    best_d = d
+                max_score = score
+
+        return best_d
