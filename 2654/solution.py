@@ -108,6 +108,23 @@ def gcd(a: int, b: int) -> int:
         a, b = b, a % b
     return a
 
+
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def minOperations(self, nums: List[int]) -> int:
+        n = len(nums)
+
+        ones = sum(num == 1 for num in nums)
+
+        if ones > 0:
+            return n - ones
+        
+        min_ops = -1
+        for i in range(n):
+            g = nums[i]
+            for j in range(i + 1, n):
+                g = gcd(g, nums[j])
+                if g == 1:
+                    min_ops = min(min_ops, (j - i) + n - 1) if min_ops != -1 else (j - i) + n - 1
+                    break
+        return min_ops
+

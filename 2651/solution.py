@@ -92,22 +92,6 @@ def is_square_matrix(matrix: List[List[Any]]) -> bool:
 
     return True
 
-@cache
-def gcd(a: int, b: int) -> int:
-    """
-    Returns the Greatest Common Divisor (GCD) of two integers.
-
-    Args:
-        a (int): The first integer.
-        b (int): The second integer.
-
-    Returns:
-        int: The GCD of `a` and `b`.
-    """
-    while b:
-        a, b = b, a % b
-    return a
-
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def findDelayedArrivalTime(self, arrivalTime: int, delayedTime: int) -> int:
+        return (arrivalTime + delayedTime) % 24

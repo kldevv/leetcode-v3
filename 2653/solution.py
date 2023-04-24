@@ -109,5 +109,14 @@ def gcd(a: int, b: int) -> int:
     return a
 
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def getSubarrayBeauty(self, nums: List[int], k: int, x: int) -> List[int]:
+        windows = SortedList()
+        beauty = []
+        for i, num in enumerate(nums):
+            if num < 0:
+                windows.add(num)
+            if i >= k and nums[i-k] < 0:
+                windows.remove(nums[i-k])
+            if i >= k - 1:
+                beauty.append(windows[x-1] if len(windows) >= x else 0)
+        return beauty
