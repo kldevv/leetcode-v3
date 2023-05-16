@@ -110,5 +110,18 @@ def gcd(a: int, b: int) -> int:
 
 
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def isWinner(self, player1: List[int], player2: List[int]) -> int:
+        def cal_score(player):
+            score = 0
+            for i in range(len(player)):
+                score += player[i]
+                if (i >= 1 and player[i-1] == 10) or (i >= 2 and player[i-2] == 10):
+                    score += player[i]
+            return score
+        
+        s1 = cal_score(player1)
+        s2 = cal_score(player2)
+
+        if s1 == s2:
+            return 0
+        return 1 if s1 > s2 else 2

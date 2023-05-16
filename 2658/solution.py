@@ -108,7 +108,28 @@ def gcd(a: int, b: int) -> int:
         a, b = b, a % b
     return a
 
-
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def findMaxFish(self, grid: List[List[int]]) -> int:
+        m = len(grid)
+        n = len(grid[0]) if m else 0
+
+        def dfs(r, c, visited):
+            cur_max_fish = grid[r][c]
+            visited.add((r, c))
+            for rr in [r+1, r-1]:
+                if rr >= 0 and rr < m and grid[rr][c] > 0 and (rr, c) not in visited:
+                    cur_max_fish += dfs(rr, c, visited)
+            
+            for cc in [c+1, c-1]:
+                if cc >= 0 and cc < n and grid[r][cc] > 0 and (r, cc) not in visited:
+                    cur_max_fish += dfs(r, cc, visited)
+
+            return cur_max_fish
+        
+        max_fish = 0
+        for r in range(m):
+            for c in range(n):
+                if grid[r][c] > 0:
+                    max_fish = max(max_fish, dfs(r, c, set()))
+
+        return max_fish

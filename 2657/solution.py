@@ -108,7 +108,22 @@ def gcd(a: int, b: int) -> int:
         a, b = b, a % b
     return a
 
-
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def findThePrefixCommonArray(self, A: List[int], B: List[int]) -> List[int]:
+        n = len(A)
+        visited = [0] * n
+        prefix_com = [0] * n
+        cur_prefix_len = 0
+
+        for i in range(n):
+            visited[A[i] - 1] += 1
+            if visited[A[i] - 1] == 2:
+                visited[A[i] - 1] = 0
+                cur_prefix_len += 1
+            visited[B[i] - 1] += 1
+            if visited[B[i] - 1] == 2:
+                visited[B[i] - 1] = 0
+                cur_prefix_len += 1
+            prefix_com[i] = cur_prefix_len
+        return prefix_com
+

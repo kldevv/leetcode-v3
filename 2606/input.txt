@@ -1,0 +1,3 @@
+s = "adaa", chars = "d", vals = [-1000]
+s = "abc", chars = "abc", vals = [-1,-1,-1]
+s = "talaqlt", chars = "tqla", vals = [4,3,3,-2]

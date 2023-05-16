@@ -108,7 +108,31 @@ def gcd(a: int, b: int) -> int:
         a, b = b, a % b
     return a
 
-
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def minimumCost(self, start: List[int], target: List[int], specialRoads: List[List[int]]) -> int:
+        # filter useful spec roads
+        spec_road = [((x1, y1), (x2, y2), cost) for x1, y1, x2, y2, cost in specialRoads if cost < abs(x1-x2)+abs(y1-y2)]
+
+        # optimized dist to end of spec roads
+        dist = defaultdict(lambda : INF)
+        dist[(0, 0)] = 0
+
+        min_queue = [(0, start)]
+        # dijskra, update all nodes' dist
+        while min_queue:
+            # cur_cost: dist from 0 to cur(x, y)
+            cur_cost, (x, y) = heapq.heappop(min_queue)
+            for (x1, y1), (x2, y2), cost in spec_road:
+                # if cur optimized dist to end of spec roads is less ideal than go to start and use the special road to end
+                # lhs: cur optimized dist from 0 to end
+                # rhs: dist from 0 to cur(x, y), then go to start, use special road
+                if dist[(x2, y2)] > abs(x-x1) + abs(y-y1) + cur_cost + cost:
+                    dist[(x2, y2)] = abs(x-x1) + abs(y-y1) + cur_cost + cost
+                    # 'cause source node is updated, we need to update its casual paths
+                    heapq.heappush(min_queue, (dist[(x2, y2)], (x2, y2)))
+        
+        shrt_dist = abs(start[0]-target[0]) + abs(start[1]-target[1])
+        for (x1, y1), (x2, y2), _ in spec_road:
+            # update if go to end and go from end to target is more ideal
+            shrt_dist = min(shrt_dist, dist[(x2, y2)] + abs(target[0]-x2) + abs(target[1]-y2))
+        return shrt_dist

@@ -110,5 +110,24 @@ def gcd(a: int, b: int) -> int:
 
 
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def firstCompleteIndex(self, arr: List[int], mat: List[List[int]]) -> int:
+        m = len(mat)
+        n = len(mat[0]) if m else 0
+
+        cols = [m] * n
+        rows = [n] * m
+
+        pos = {}
+        for i in range(m):
+            for j in range(n):
+                pos[mat[i][j]] = (i, j)
+
+        for k, x in enumerate(arr):
+            i, j = pos[x]
+            
+            rows[i] -= 1
+            cols[j] -= 1
+            if rows[i] == 0 or cols[j] == 0:
+                return k
+        
+        return len(arr) + 1

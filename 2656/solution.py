@@ -108,7 +108,7 @@ def gcd(a: int, b: int) -> int:
         a, b = b, a % b
     return a
 
-
 class Solution:
-    def leetCodeQuestion() -> None:
-        pass
+    def maximizeSum(self, nums: List[int], k: int) -> int:
+        max_num = max(nums)
+        return (max_num * k) + (k - 1) * k // 2
