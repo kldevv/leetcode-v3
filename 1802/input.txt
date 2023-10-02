@@ -1,0 +1,4 @@
+n = 4, index = 2, maxSum = 6
+n = 6, index = 1, maxSum = 10
+n = 3, index = 2, maxSum = 18
+n = 4, index = 0, maxSum = 4
