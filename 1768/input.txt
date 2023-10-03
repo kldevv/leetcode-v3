@@ -1,0 +1,3 @@
+word1 = "abc", word2 = "pqr"
+word1 = "ab", word2 = "pqrs"
+word1 = "abcd", word2 = "pq"
