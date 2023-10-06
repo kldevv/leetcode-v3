@@ -1,0 +1,3 @@
+target = "10111"
+target = "101"
+target = "00000"
