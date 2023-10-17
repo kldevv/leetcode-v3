@@ -1,0 +1,2 @@
+s = "leetscode", dictionary = ["leet","code","leetcode"]
+s = "sayhelloworld", dictionary = ["hello","world"]
